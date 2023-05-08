@@ -4,6 +4,7 @@
 //station starting coordinates
 int stationX[13] = {0, 1, 2, 3, 4, 4, 4, 3, 2, 1, 0, 0, 0};
 int stationY[13] = {0, 4, 4, 4, 3, 2, 1, 0, 0, 0, 1, 2, 3};
+int stationGO[13] = {0, 0, 0, 0, 3, 3, 3, 2, 2, 2, 1, 1, 1};//global orientation when coming out of station
 
 //holds distances associated with nodes(x,y)
 int nodeboard[5][5];
@@ -45,6 +46,12 @@ void clearEdgeInfo(void){
         }
     }
 }
+
+//blocks edge
+void blockEdge(int x, int y, int s){
+    if(s) edgesS[x][y] = 0;
+    else edgesE[x][y] = 0;
+}
 //////end Mapping
 
 //////Routing
@@ -55,12 +62,14 @@ struct LTNode{
     LTNode* parent;
     int x;
     int y;
+    int go;//global orientation
 };
 
 
 //stores final route
 int* routeX;
 int* routeY;
+int* routeDir;
 int routeLength;
 /*add left, right, forward info*/
 /*maybe add fake nodes after running algoritm to simulate moving into station(or just required directions)*/
@@ -69,12 +78,13 @@ int routeLength;
 LTNode base;
 
 //routing algoritm
-void Route(int startX, int startY, int endX, int endY){
+void Route(int startX, int startY, int startDir, int endX, int endY){
     //assign basevalues
     base.x = endX;
     base.y = endY;
     base.parent = 0;
     base.next = 0;
+    base.go = 4;//unused
     
     ////prepping for infection algorithm
     LTNode* endOfChain = &base;//used to track last entry in linked chain
@@ -114,6 +124,7 @@ void Route(int startX, int startY, int endX, int endY){
                         new->y = curS->y;
                         new->parent = curS;
                         new->next = 0;
+                        new->go = 1;
                         endOfChain->next = new;
                         endOfChain = new;
                         nodeboard[new->x][new->y] = iteration;
@@ -124,7 +135,7 @@ void Route(int startX, int startY, int endX, int endY){
                             startNode = new;
                             //printf("found\n");
                         }
-                        //printf("new: %i at c%i%i\n", iteration, new->x, new->y);
+                        printf("new: %i at c%i%i left\n", iteration, new->y, new->x);
                     }
                 }
             }
@@ -140,6 +151,7 @@ void Route(int startX, int startY, int endX, int endY){
                         new->y = curS->y;
                         new->parent = curS;
                         new->next = 0;
+                        new->go = 3;
                         endOfChain->next = new;
                         endOfChain = new;
                         nodeboard[new->x][new->y] = iteration;
@@ -150,7 +162,7 @@ void Route(int startX, int startY, int endX, int endY){
                             startNode = new;
                             //printf("found\n");
                         }
-                        //printf("new: %i at c%i%i\n", iteration, new->x, new->y);
+                        printf("new: %i at c%i%i right\n", iteration, new->y, new->x);
                     }
                 }
             }
@@ -166,6 +178,7 @@ void Route(int startX, int startY, int endX, int endY){
                         new->y = curS->y-1;
                         new->parent = curS;
                         new->next = 0;
+                        new->go = 2;
                         endOfChain->next = new;
                         endOfChain = new;
                         nodeboard[new->x][new->y] = iteration;
@@ -176,7 +189,7 @@ void Route(int startX, int startY, int endX, int endY){
                             startNode = new;
                             //printf("found\n");
                         }
-                        //printf("new: %i at c%i%i\n", iteration, new->x, new->y);
+                        printf("new: %i at c%i%i up\n", iteration, new->y, new->x);
                     }
                 }
             }
@@ -192,6 +205,7 @@ void Route(int startX, int startY, int endX, int endY){
                         new->y = curS->y+1;
                         new->parent = curS;
                         new->next = 0;
+                        new->go = 0;
                         endOfChain->next = new;
                         endOfChain = new;
                         nodeboard[new->x][new->y] = iteration;
@@ -202,7 +216,7 @@ void Route(int startX, int startY, int endX, int endY){
                             startNode = new;
                             //printf("found\n");
                         }
-                        //printf("new: %i at c%i%i\n", iteration, new->x, new->y);
+                        printf("new: %i at c%i%i down\n", iteration, new->y, new->x);
                     }
                 }
             }
@@ -226,14 +240,21 @@ void Route(int startX, int startY, int endX, int endY){
     //
     if(routeX) free(routeX);
     if(routeY) free(routeY);
+    if(routeDir) free(routeDir);
     routeX = (int*)malloc(routeLength*sizeof(int));
     routeY = (int*)malloc(routeLength*sizeof(int));
+    routeDir = (int*)malloc((routeLength-1)*sizeof(int));
     LTNode* curTNode = startNode;
+    LTNode placeholderStartOrientation;
+    placeholderStartOrientation.go = startDir;
+    LTNode* prevTNode = &placeholderStartOrientation;
     //determining route
     for(int i = 0; i < routeLength; i++){
         routeX[i] = curTNode->x;
         routeY[i] = curTNode->y;
-        //printf("c%i%i\n",routeX[i],routeY[i]);
+        if(i < routeLength-1) routeDir[i] = curTNode->go - prevTNode->go;
+        printf("c%i%i at go %i\n",routeY[i],routeX[i], curTNode->go);
+        prevTNode = curTNode;
         curTNode = curTNode->parent;
     }
     //clearing memory elements
@@ -247,13 +268,28 @@ void Route(int startX, int startY, int endX, int endY){
     }
 }
 
+////Display region
+void printRoute(void){
+    for(int i = 0; i < routeLength; i++){
+        printf("c%i%i ", routeY[i],routeX[i]);
+        if( i < routeLength-1) {
+            switch(routeDir[i]){
+                case 0:printf("forward ");break;
+                case 1:printf("right ");break;
+                case 2:printf("backwards ");break;
+                default:printf("left ");break;
+            }
+        }
+    }
+    printf("\b\n");
+}
+
 ////executing region
 int main(void){
     clearNodeBoard();
     clearEdgeInfo();
-    Route(stationX[1],stationY[1],stationX[9],stationY[9]);
-    for(int i = 0; i < routeLength; i++){
-        printf("c%i%i ", routeX[i],routeY[i]);
-    }
-    printf("\b\n");
+    blockEdge(0,2,1);
+    blockEdge(3,2,0);
+    Route(stationX[10],stationY[10], stationGO[10],stationX[12],stationY[12]);
+    printRoute();
 }
