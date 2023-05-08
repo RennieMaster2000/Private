@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 //////Mapping
+
 //station starting coordinates
 int stationX[13] = {0, 1, 2, 3, 4, 4, 4, 3, 2, 1, 0, 0, 0};
 int stationY[13] = {0, 4, 4, 4, 3, 2, 1, 0, 0, 0, 1, 2, 3};
@@ -55,6 +56,7 @@ void blockEdge(int x, int y, int s){
 //////end Mapping
 
 //////Routing
+
 //linked tree node struct
 typedef struct LTNode LTNode;
 struct LTNode{
@@ -269,6 +271,8 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
 }
 
 ////Display region
+
+//print the nodes on route and the directions inbetween
 void printRoute(void){
     for(int i = 0; i < routeLength; i++){
         printf("c%i%i ", routeY[i],routeX[i]);
@@ -285,11 +289,20 @@ void printRoute(void){
 }
 
 ////executing region
+
 int main(void){
     clearNodeBoard();
     clearEdgeInfo();
-    blockEdge(0,2,1);
-    blockEdge(3,2,0);
-    Route(stationX[10],stationY[10], stationGO[10],stationX[12],stationY[12]);
+    blockEdge(1,0,1);
+    blockEdge(1,1,1);
+    blockEdge(1,2,1);
+    blockEdge(1,3,1);
+    blockEdge(3,1,1);
+    blockEdge(3,2,1);
+    blockEdge(3,3,1);
+    blockEdge(3,0,1);
+    blockEdge(1,4,0);
+    blockEdge(2,0,0);
+    Route(stationX[1],stationY[1], stationGO[1],stationX[7],stationY[7]);
     printRoute();
 }
