@@ -1,5 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
+//////Improved maths
+
+//converts numbers elliptically to modulus 4 space
+int toMod4(int num){
+    num = num%4;
+    if (num<0) num+=4;
+    return num;
+}
 //////Mapping
 
 //station starting coordinates
@@ -254,8 +262,8 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
     for(int i = 0; i < routeLength; i++){
         routeX[i] = curTNode->x;
         routeY[i] = curTNode->y;
-        if(i < routeLength-1) routeDir[i] = curTNode->go - prevTNode->go;
-        printf("c%i%i at go %i\n",routeY[i],routeX[i], curTNode->go);
+        if(i < routeLength-1){ routeDir[i] = toMod4(curTNode->go - prevTNode->go); /*printf("c%i%i: dir=%i-%i=%i\n",routeY[i],routeX[i], curTNode->go, prevTNode->go, routeDir[i]);*/}
+        //printf("c%i%i at go %i\n",routeY[i],routeX[i], curTNode->go);
         prevTNode = curTNode;
         curTNode = curTNode->parent;
     }
