@@ -297,7 +297,7 @@ void printRoute(void){
 }
 
 ////executing region
-
+/*
 int main(void){
     clearNodeBoard();
     clearEdgeInfo();
@@ -314,3 +314,4 @@ int main(void){
     Route(stationX[1],stationY[1], stationGO[1],stationX[7],stationY[7]);
     printRoute();
 }
+*/
