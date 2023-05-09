@@ -6,11 +6,13 @@
 
 //station starting coordinates
 //x coord of stations nearest node
-int stationX[13];
+int getStationX(int i);
+
 //y coord of stations nearest node
-int stationY[13];
+int getStationY(int i);
+
 //global orientation when driving out of station
-int stationGO[13];//global orientation when coming out of station
+int getStationGO(int i);//global orientation when coming out of station
 
 //holds distances associated with nodes(x,y)
 //int nodeboard[5][5];--hidden--
@@ -46,12 +48,17 @@ struct LTNode{
 
 
 //stores final route
+/*
 int* routeX;
 int* routeY;
 int* routeDir;
 int routeLength;
+*/
 /*add left, right, forward info*/
 /*maybe add fake nodes after running algoritm to simulate moving into station(or just required directions)*/
+
+//moves pointer to routeDir array. also returns route direction array length
+int retrieveRouteDir(int** pointer);
 
 //stores tree base-node
 //LTNode base; --hidden--

@@ -15,6 +15,10 @@ int stationX[13] = {0, 1, 2, 3, 4, 4, 4, 3, 2, 1, 0, 0, 0};
 int stationY[13] = {0, 4, 4, 4, 3, 2, 1, 0, 0, 0, 1, 2, 3};
 int stationGO[13] = {0, 0, 0, 0, 3, 3, 3, 2, 2, 2, 1, 1, 1};//global orientation when coming out of station
 
+int getStationX(int i){return stationX[i];};
+int getStationY(int i){return stationY[i];};
+int getStationGO(int i){return stationGO[i];};
+
 //holds distances associated with nodes(x,y)
 int nodeboard[5][5];
 
@@ -83,6 +87,12 @@ int* routeDir;
 int routeLength;
 /*add left, right, forward info*/
 /*maybe add fake nodes after running algoritm to simulate moving into station(or just required directions)*/
+
+//moves pointer to routeDir array. also returns route direction array length
+int retrieveRouteDir(int** pointer){
+    *pointer = routeDir;
+    return routeLength - 1;
+}
 
 //stores tree base-node
 LTNode base;
