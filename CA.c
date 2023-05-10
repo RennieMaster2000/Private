@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "nodeOnly.h"
-//test text
 
 //executes Challenge A, starts at station 1 and moves to all stations
 void Execute(int s1, int s2, int s3){
