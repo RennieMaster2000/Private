@@ -14,7 +14,7 @@ int recieve(void);
 void DriveToFrom(int start, int end){
     ////routing
     clearNodeBoard();
-    Route(getStationX(start), getStationY(start),getStationGo(start),getStationX(end),getStationY(end));
+    Route(getStationX(start), getStationY(start),getStationGO(start),getStationX(end),getStationY(end));
     routeLN = retrieveRouteInfo(&routeDir, &routeX, &routeY);
     ////drive out
     int driveOutLocDir = toMod4(getStationGO(start)-curO);
@@ -54,12 +54,13 @@ void send(int d){
 
 int recieve(void){
     int d;
+    printf("recieve: ");
     scanf("%i", &d);
     return d;
 }
 
 int main(void){
     clearEdgeInfo();
-    DriveToFrom(1,2);
+    DriveToFrom(1,12);
     return 0;
 }

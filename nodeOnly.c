@@ -157,7 +157,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                             startNode = new;
                             //printf("found\n");
                         }
-                        printf("new: %i at c%i%i left\n", iteration, new->y, new->x);
+                        //printf("new: %i at c%i%i left\n", iteration, new->y, new->x);
                     }
                 }
             }
@@ -184,7 +184,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                             startNode = new;
                             //printf("found\n");
                         }
-                        printf("new: %i at c%i%i right\n", iteration, new->y, new->x);
+                        //printf("new: %i at c%i%i right\n", iteration, new->y, new->x);
                     }
                 }
             }
@@ -211,7 +211,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                             startNode = new;
                             //printf("found\n");
                         }
-                        printf("new: %i at c%i%i up\n", iteration, new->y, new->x);
+                        //printf("new: %i at c%i%i up\n", iteration, new->y, new->x);
                     }
                 }
             }
@@ -238,7 +238,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                             startNode = new;
                             //printf("found\n");
                         }
-                        printf("new: %i at c%i%i down\n", iteration, new->y, new->x);
+                        //printf("new: %i at c%i%i down\n", iteration, new->y, new->x);
                     }
                 }
             }
@@ -423,27 +423,14 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
     return shortest;
 }
 ////executing region
-
+/*
 int main(void){
     
     clearNodeBoard();
     clearEdgeInfo();
-    /*
-    blockEdge(1,0,1);
-    blockEdge(1,1,1);
-    blockEdge(1,2,1);
-    blockEdge(1,3,1);
-    blockEdge(3,1,1);
-    blockEdge(3,2,1);
-    blockEdge(3,3,1);
-    blockEdge(3,0,1);
-    blockEdge(1,4,0);
-    blockEdge(2,0,0);
-    Route(stationX[1],stationY[1], stationGO[1],stationX[7],stationY[7]);
-    printRoute();
-    */
    int ends[] = {3, 4 ,5 ,6 ,7 ,8, 9, 10, 11, 12};
    int endsLN = 10;
    int shortestTo1 = closestStation(1, ends, endsLN);
    printf("\nclosest station to 1 is %i\n", shortestTo1);
 }
+*/
