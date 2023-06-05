@@ -329,7 +329,7 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
     spreadersX[0] = stationX[startStation];
     spreadersY[0] = stationY[startStation];
     int iteration = 0;
-    while(totalInfected<25){
+    while(1){
         iteration++;
         printf("\niteration %i:\n", iteration);
         for(int i = 0; i < spreadersLN; i++){
