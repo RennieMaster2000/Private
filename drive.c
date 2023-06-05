@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "nodeOnly.h"
+#include "COM.h"
 int curO = 0;//getStationGO(1);
 int curX;
 int curY;
@@ -28,39 +29,50 @@ void DriveToFrom(int start, int end){
         curO = (curO+routeDir[i])%4;
         ////recieve
         //recieve
-        recieve();
-        //apply only when recieving ok
-        curX = routeX[i];
-        curY = routeY[i];
-        //
-
-        //apply when recieving mine
-        //curO = (curO+2)%2
-        //return 0
-        //
+        int response = recieve();
+        if(response){
+            ////mine
+            //apply new orientation, pos stays the same
+            curO = (curO+2)%2;
+            return 0;
+        }
+        else{
+            ////ok
+            //apply new position
+            curX = routeX[i];
+            curY = routeY[i];
+        }
     }
     ////drive in
     int driveInLocDir = toMod4(getStationGO(end) + 2 - curO);
     send(driveInLocDir);
     //wait for response? do we get an ok when reaching end staion? y:we send final then, n: we should prob do that
     //!!final is send by the main control, not this function
-
-    //return 1
+    recieve();
+    return 1;
 }
+//function for position to position(C)
+//function for position to station(B)
+//possibly seperate station from onboard movement
 
 void send(int d){
     printf("send: %i\n",d);
+    sendCOM(d);
 }
 
 int recieve(void){
     int d;
     printf("recieve: ");
-    scanf("%i", &d);
+    d = recieveCOM();
+    printf("%i\n",d);
+    //scanf("%i", &d);
     return d;
 }
 
 int main(void){
+    InitialiseCom();
     clearEdgeInfo();
     DriveToFrom(1,12);
+    CloseCom();
     return 0;
 }

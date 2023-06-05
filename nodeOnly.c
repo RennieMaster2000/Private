@@ -281,6 +281,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
     }
     //clearing memory elements
     LTNode* curCNode = base.next;
+    printf("biepbapboep\n%p\nladada", curCNode);
     while(1){
         LTNode* nextNode = curCNode->next;
         //printf("Next node: (%i, %i) at %p\n", nextNode->x,nextNode->y,nextNode);
@@ -423,14 +424,14 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
     return shortest;
 }
 ////executing region
-/*
+
 int main(void){
-    
     clearNodeBoard();
     clearEdgeInfo();
+    
+    Route(0,0,0,4, 4);
    int ends[] = {3, 4 ,5 ,6 ,7 ,8, 9, 10, 11, 12};
    int endsLN = 10;
    int shortestTo1 = closestStation(1, ends, endsLN);
    printf("\nclosest station to 1 is %i\n", shortestTo1);
 }
-*/

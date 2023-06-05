@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #include <Windows.h>
 #include <string.h>
+#include <time.h>
 
-#define COMPORT "COM5"
+#define COMPORT "COM2"
 #define BAUDRATE CBR_9600
+#define DLAY 10
+#define TIMEOUT 10
 
 HANDLE hSerial;
 //--------------------------------------------------------------
@@ -61,7 +64,7 @@ int readByte(char *buffRead) {
     {
         printf("error reading byte from input buffer \n");
     }
-    printf("Byte read from read buffer is: %c \n", buffRead[0]);
+    //printf("Byte read from read buffer is: %c \n", buffRead[0]);
     return(0);
 }
 
@@ -78,7 +81,7 @@ int writeByte(char *buffWrite){
     {
         printf("error writing byte to output buffer \n");
     }
-    printf("Byte written to write buffer is: %c \n", buffWrite[0]);
+    //printf("Byte written to write buffer is: %c \n", buffWrite[0]);
 
     return(0);
 }
@@ -116,7 +119,7 @@ int InitialiseCom(void)
     // Initialize the parameters of the COM port
     //----------------------------------------------------------
 
-    initSio(hSerial);
+    initSio();
 
     printf("Opened COM\n");
     return 0;
@@ -128,15 +131,20 @@ void CloseCom(void){
 }
 
 //sends the first 8 bits of an int
-void send(int d){
+void sendCOM(int d){
     //could be d has no adress?
     writeByte(&d);
 }
 
 //waits till it recieves a byte, and returns it in an int
-int recieve(void){
+int recieveCOM(void){
     //test if it already waits to recieve something
-    int d;
-    readByte(&d);
-    return d;
+    char d = 119;
+    int i = 0;
+    while(d==119){
+        readByte(&d);
+        //delay(DLAY);
+        i++;
+    }
+    return (int)d;
 }
