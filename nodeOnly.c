@@ -20,7 +20,7 @@ int getStationY(int i){return stationY[i];};
 int getStationGO(int i){return stationGO[i];};
 
 //holds distances associated with nodes(x,y)
-int nodeboard[5][5];
+int nodeboard[5][5];//
 
 //holds edge information(1 open, 0 blocked) (x,y)
 int edgesS[5][4];
