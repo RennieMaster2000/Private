@@ -1,7 +1,7 @@
 //////Improved maths
 
 //converts numbers elliptically to modulus 4 space
-//int toMod4(int num);--hidden--
+int toMod4(int num);//--hidden--
 //////Mapping
 
 //station starting coordinates
@@ -57,14 +57,17 @@ int routeLength;
 /*add left, right, forward info*/
 /*maybe add fake nodes after running algoritm to simulate moving into station(or just required directions)*/
 
-//moves pointer to routeDir array. also returns route direction array length
-int retrieveRouteDir(int** pointer);
+//moves dir pointer to routeDir array, and x/y to x/y array(starting from the second note). also returns route direction array length
+int retrieveRouteInfo(int** dir, int** x, int** y);
 
 //stores tree base-node
 //LTNode base; --hidden--
 
 //routing algoritm
 void Route(int startX, int startY, int startDir, int endX, int endY);
+
+//closest station to a start station
+int closestStation(int startStation, int* endStations, int lnEndStations);
 
 ////Display region
 

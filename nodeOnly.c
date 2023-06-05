@@ -88,9 +88,11 @@ int routeLength;
 /*add left, right, forward info*/
 /*maybe add fake nodes after running algoritm to simulate moving into station(or just required directions)*/
 
-//moves pointer to routeDir array. also returns route direction array length
-int retrieveRouteDir(int** pointer){
-    *pointer = routeDir;
+//moves dir pointer to routeDir array, and x/y to x/y array(starting from the second note). also returns route direction array length
+int retrieveRouteInfo(int** dir, int** x, int** y){
+    *dir = routeDir;
+    *x = routeX + sizeof(int);
+    *y = routeY + sizeof(int);
     return routeLength - 1;
 }
 
@@ -306,11 +308,127 @@ void printRoute(void){
     printf("\b\n");
 }
 
+int closestStation(int startStation, int* endStations, int lnEndStations){
+    //spread entire board
+    int totalInfected = 1;//if tI=25, or infectedLN=0: stop spreading
+
+    int board[5][5];
+    int buff1x[128];
+    int buff1y[128];
+    int buff2x[128];
+    int buff2y[128];
+
+    int* spreadersX = buff1x;
+    int* spreadersY = buff1y;
+    int spreadersLN = 1;
+    int* infectedX = buff2x;
+    int* infectedY = buff2y;
+    int infectedLN = 0;
+
+    spreadersX[0] = stationX[startStation];
+    spreadersY[0] = stationY[startStation];
+    int iteration = 0;
+    while(totalInfected<25){
+        iteration++;
+        printf("\niteration %i:\n", iteration);
+        for(int i = 0; i < spreadersLN; i++){
+            int curSX = spreadersX[i];
+            int curSY = spreadersY[i];
+            printf("\n\tspread from (%i,%i)\n\t\t", curSX, curSY);
+            //left
+            if(Inbound(curSX-1, curSY)){
+                //node exists
+                if(edgesE[curSX-1][curSY]){
+                    //not blocked
+                    if(!board[curSX-1][curSY]){
+                        //gets infected
+                        board[curSX-1][curSY] = iteration;
+                        infectedX[infectedLN] = curSX - 1;
+                        infectedY[infectedLN] = curSY;
+                        printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        infectedLN++;
+                    }
+                }
+            }
+            //right
+            if(Inbound(curSX+1, curSY)){
+                //node exists
+                if(edgesE[curSX][curSY]){
+                    //not blocked
+                    if(!board[curSX+1][curSY]){
+                        //gets infected
+                        board[curSX+1][curSY] = iteration;
+                        infectedX[infectedLN] = curSX+1;
+                        infectedY[infectedLN] = curSY;
+                        printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        infectedLN++;
+                    }
+                }
+            }
+            //up
+            if(Inbound(curSX, curSY-1)){
+                //node exists
+                if(edgesS[curSX][curSY-1]){
+                    //not blocked
+                    if(!board[curSX][curSY-1]){
+                        //gets infected
+                        board[curSX][curSY-1] = iteration;
+                        infectedX[infectedLN] = curSX;
+                        infectedY[infectedLN] = curSY-1;
+                        printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        infectedLN++;
+                    }
+                }
+            }
+            //down
+            if(Inbound(curSX, curSY+1)){
+                //node exists
+                if(edgesS[curSX][curSY]){
+                    //not blocked
+                    if(!board[curSX][curSY+1]){
+                        //gets infected
+                        board[curSX][curSY+1] = iteration;
+                        infectedX[infectedLN] = curSX;
+                        infectedY[infectedLN] = curSY+1;
+                        printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        infectedLN++;
+                    }
+                }
+            }
+
+        }
+        //switch buffer
+        int* aX;
+        int* aY;
+        aX = spreadersX;
+        aY = spreadersY;
+        spreadersX = infectedX;
+        spreadersY = infectedY;
+        infectedX = aX;
+        infectedY = aY;
+        spreadersLN = infectedLN;
+        infectedLN = 0;
+        if(spreadersLN == 0) break;//stopped spreading
+    }
+    //determine shortest route
+    int shortest = 0;
+    int length = 0xFF;
+    for(int i = 0; i < lnEndStations; i++){
+        //check if shortest
+        if(board[stationX[endStations[i]]][stationY[endStations[i]]] < length){
+            shortest = endStations[i];
+            length = board[stationX[endStations[i]]][stationY[endStations[i]]];
+        }
+    }
+    return shortest;
+}
 ////executing region
-/*
+
 int main(void){
+    
     clearNodeBoard();
     clearEdgeInfo();
+    /*
     blockEdge(1,0,1);
     blockEdge(1,1,1);
     blockEdge(1,2,1);
@@ -323,5 +441,9 @@ int main(void){
     blockEdge(2,0,0);
     Route(stationX[1],stationY[1], stationGO[1],stationX[7],stationY[7]);
     printRoute();
+    */
+   int ends[] = {3, 4 ,5 ,6 ,7 ,8, 9, 10, 11, 12};
+   int endsLN = 10;
+   int shortestTo1 = closestStation(1, ends, endsLN);
+   printf("\nclosest station to 1 is %i\n", shortestTo1);
 }
-*/
