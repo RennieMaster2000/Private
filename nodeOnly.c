@@ -20,7 +20,7 @@ int getStationY(int i){return stationY[i];};
 int getStationGO(int i){return stationGO[i];};
 
 //holds distances associated with nodes(x,y)
-int nodeboard[5][5];
+int nodeboard[5][5];//
 
 //holds edge information(1 open, 0 blocked) (x,y)
 int edgesS[5][4];
@@ -281,7 +281,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
     }
     //clearing memory elements
     LTNode* curCNode = base.next;
-    printf("biepbapboep\n%p\nladada", curCNode);
+    //printf("biepbapboep\n%p\nladada", curCNode);
     while(1){
         LTNode* nextNode = curCNode->next;
         //printf("Next node: (%i, %i) at %p\n", nextNode->x,nextNode->y,nextNode);
@@ -313,7 +313,7 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
     //spread entire board
     int totalInfected = 1;//if tI=25, or infectedLN=0: stop spreading
 
-    int board[5][5];
+    int board[5][5] = {{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
     int buff1x[128];
     int buff1y[128];
     int buff2x[128];
@@ -328,14 +328,15 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
 
     spreadersX[0] = stationX[startStation];
     spreadersY[0] = stationY[startStation];
-    int iteration = 0;
+    int iteration = 1;//
+    board[stationX[startStation]][stationY[startStation]] = iteration;
     while(1){
         iteration++;
-        printf("\niteration %i:\n", iteration);
+        //printf("\niteration %i:\n", iteration);
         for(int i = 0; i < spreadersLN; i++){
             int curSX = spreadersX[i];
             int curSY = spreadersY[i];
-            printf("\n\tspread from (%i,%i)\n\t\t", curSX, curSY);
+            //printf("\n\tspread from (%i,%i)\n\t\t", curSX, curSY);
             //left
             if(Inbound(curSX-1, curSY)){
                 //node exists
@@ -346,10 +347,19 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
                         board[curSX-1][curSY] = iteration;
                         infectedX[infectedLN] = curSX - 1;
                         infectedY[infectedLN] = curSY;
-                        printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        //printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
                         infectedLN++;
                     }
+                    else{
+                        //printf("immune-left ");
+                    }
                 }
+                else{
+                    //printf("block-left ");
+                }
+            }
+            else{
+                //printf("out-left ");
             }
             //right
             if(Inbound(curSX+1, curSY)){
@@ -361,10 +371,19 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
                         board[curSX+1][curSY] = iteration;
                         infectedX[infectedLN] = curSX+1;
                         infectedY[infectedLN] = curSY;
-                        printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        //printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
                         infectedLN++;
                     }
+                    else{
+                        //printf("immune-right ");
+                    }
                 }
+                else{
+                    //printf("block-right ");
+                }
+            }
+            else{
+                //printf("out-right ");
             }
             //up
             if(Inbound(curSX, curSY-1)){
@@ -376,10 +395,19 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
                         board[curSX][curSY-1] = iteration;
                         infectedX[infectedLN] = curSX;
                         infectedY[infectedLN] = curSY-1;
-                        printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        //printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
                         infectedLN++;
                     }
+                    else{
+                        //printf("immune-up ");
+                    }
                 }
+                else{
+                    //printf("block-up ");
+                }
+            }
+            else{
+                //printf("out-up ");
             }
             //down
             if(Inbound(curSX, curSY+1)){
@@ -391,10 +419,19 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
                         board[curSX][curSY+1] = iteration;
                         infectedX[infectedLN] = curSX;
                         infectedY[infectedLN] = curSY+1;
-                        printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        //printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
                         infectedLN++;
                     }
+                    else{
+                        //printf("immune-down ");
+                    }
                 }
+                else{
+                    //printf("block-down ");
+                }
+            }
+            else{
+                //printf("out-down ");
             }
 
         }
@@ -433,5 +470,5 @@ int main(void){
    int ends[] = {3, 4 ,5 ,6 ,7 ,8, 9, 10, 11, 12};
    int endsLN = 10;
    int shortestTo1 = closestStation(1, ends, endsLN);
-   printf("\nclosest station to 1 is %i\n", shortestTo1);
+   printf("closest station to 1 is %i\n", shortestTo1);
 }
