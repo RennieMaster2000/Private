@@ -328,7 +328,7 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
 
     spreadersX[0] = stationX[startStation];
     spreadersY[0] = stationY[startStation];
-    int iteration = 1;
+    int iteration = 1;//
     board[stationX[startStation]][stationY[startStation]] = iteration;
     while(1){
         iteration++;
