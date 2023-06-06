@@ -106,6 +106,7 @@ void clearEdgeInfo(void){
 
 //blocks edge
 void blockEdge(int x, int y, int s){
+    //printf("blocking x:%i y:%i s:%i\n",x,y,s);
     if(s) edgesS[x][y] = 0;
     else edgesE[x][y] = 0;
 }
@@ -530,6 +531,7 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
 }
 ////executing region
 
+/*
 int main(void){
     clearNodeBoard();
     clearEdgeInfo();
@@ -541,3 +543,4 @@ int main(void){
    int shortestTo1 = closestStation(1, ends, endsLN);
    printf("closest station to 1 is %i\n", shortestTo1);
 }
+*/
