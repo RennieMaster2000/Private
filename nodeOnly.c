@@ -11,8 +11,8 @@ int toMod4(int num){
 //////Mapping
 
 //station starting coordinates
-int stationX[13] = {0, 1, 2, 3, 4, 4, 4, 3, 2, 1, 0, 0, 0};
-int stationY[13] = {0, 4, 4, 4, 3, 2, 1, 0, 0, 0, 1, 2, 3};
+int stationX[13] = {0, 1, 2, 3, 5, 5, 5, 3, 2, 1, -1, -1, -1};
+int stationY[13] = {0, 5, 5, 5, 3, 2, 1, -1, -1, -1, 1, 2, 3};
 int stationGO[13] = {0, 0, 0, 0, 3, 3, 3, 2, 2, 2, 1, 1, 1};//global orientation when coming out of station
 
 int getStationX(int i){return stationX[i];};
@@ -20,7 +20,7 @@ int getStationY(int i){return stationY[i];};
 int getStationGO(int i){return stationGO[i];};
 
 //holds distances associated with nodes(x,y)
-int nodeboard[5][5];//
+int nodeboard[7][7];//
 
 //holds edge information(1 open, 0 blocked) (x,y)
 int edgesS[5][4];
@@ -41,10 +41,54 @@ int Inbound(int x, int y){
     return result;
 }
 
+//returns 1 if node is within imaginative bounds
+int InboundIm(int x, int y){
+    int result = 0;
+    if(x >= 0){
+        if(x<5){
+            if(y >= 0){
+                if(y<5){
+                    //only real result
+                    result = 1;
+                }
+                else if(y == 5){
+                    if(x >= 1){
+                        if(x < 4){
+                            result = 1;
+                        }
+                    }
+                }
+            }
+            else if(y == -1){
+                if(x >= 1){
+                    if(x < 4){
+                        result = 1;
+                    }
+                }
+            }
+        }
+        else if(x == 5){
+            if(y >= 1){
+                if(y < 4){
+                    result = 1;
+                }
+            }
+        }
+    }
+    else if(x == -1){
+        if(y >= 1){
+            if(y < 4){
+                result = 1;
+            }
+        }
+    }
+    return result;
+}
+
 //clears distances associated with nodes
 void clearNodeBoard(void){
-    for(int x = 0; x < 5; x++){
-        for(int y = 0; y < 5; y++){
+    for(int x = 0; x < 7; x++){
+        for(int y = 0; y < 7; y++){
             nodeboard[x][y] = 0;
         }
     }
@@ -64,6 +108,26 @@ void clearEdgeInfo(void){
 void blockEdge(int x, int y, int s){
     if(s) edgesS[x][y] = 0;
     else edgesE[x][y] = 0;
+}
+
+//returns 1 if Edge is accesible
+int checkEdge(int x, int y, int s){
+    int result = 0;
+    if(s){
+        if(x >= 0 && x < 5){
+            //not x==-1 or x==5 columns
+            if(y == -1 || y == 4) result = 1;
+            else result = edgesS[x][y];
+        }
+    }
+    else{
+        if(y >= 0 && y < 5){
+            //not y==-1 or y==5 rows
+            if(y == -1 || y == 4) result = 1;
+            else result = edgesE[x][y];
+        }
+    }
+    return result;
 }
 //////end Mapping
 
@@ -123,23 +187,24 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
     spreaders[0] = &base;
     spreadersLN++;
     //
-    nodeboard[endX][endY] = 1;
+    nodeboard[endX+1][endY+1] = 1;
     int iteration = 1;
     LTNode* startNode;
     int lengthList = 0;
-
+    
     ////infection algorithm
-    while(!nodeboard[startX][startY]){
+    while(!nodeboard[startX+1][startY+1]){
         //spread
         iteration++;
         for(int i = 0; i < spreadersLN; i++){
             LTNode* curS = spreaders[i];
+            //printf("spreading from: c%i%i\n", curS->y,curS->x);
             //left
-            if(Inbound(curS->x-1, curS->y)){
+            if(InboundIm(curS->x-1, curS->y)){
                 //node exists
-                if(edgesE[curS->x-1][curS->y]){
+                if(checkEdge(curS->x-1,curS->y,0)){
                     //not blocked
-                    if(!nodeboard[curS->x-1][curS->y]){
+                    if(!nodeboard[curS->x][curS->y+1]){
                         //gets infected
                         LTNode* new = (LTNode*) malloc(sizeof(LTNode));
                         new->x = curS->x-1;
@@ -149,7 +214,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                         new->go = 1;
                         endOfChain->next = new;
                         endOfChain = new;
-                        nodeboard[new->x][new->y] = iteration;
+                        nodeboard[new->x+1][new->y+1] = iteration;
                         infected[infectedLN] = new;
                         infectedLN++;
                         //check if not startNode
@@ -162,11 +227,11 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                 }
             }
             //right
-            if(Inbound(curS->x+1, curS->y)){
+            if(InboundIm(curS->x+1, curS->y)){
                 //node exists
-                if(edgesE[curS->x][curS->y]){
+                if(checkEdge(curS->x,curS->y,0)){
                     //not blocked
-                    if(!nodeboard[curS->x+1][curS->y]){
+                    if(!nodeboard[curS->x+2][curS->y+1]){
                         //gets infected
                         LTNode* new = (LTNode*) malloc(sizeof(LTNode));
                         new->x = curS->x+1;
@@ -176,7 +241,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                         new->go = 3;
                         endOfChain->next = new;
                         endOfChain = new;
-                        nodeboard[new->x][new->y] = iteration;
+                        nodeboard[new->x+1][new->y+1] = iteration;
                         infected[infectedLN] = new;
                         infectedLN++;
                         //check if not startNode
@@ -189,11 +254,11 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                 }
             }
             //up
-            if(Inbound(curS->x, curS->y-1)){
+            if(InboundIm(curS->x, curS->y-1)){
                 //node exists
-                if(edgesS[curS->x][curS->y-1]){
+                if(checkEdge(curS->x,curS->y-1,1)){
                     //not blocked
-                    if(!nodeboard[curS->x][curS->y-1]){
+                    if(!nodeboard[curS->x+1][curS->y]){
                         //gets infected
                         LTNode* new = (LTNode*) malloc(sizeof(LTNode));
                         new->x = curS->x;
@@ -203,7 +268,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                         new->go = 2;
                         endOfChain->next = new;
                         endOfChain = new;
-                        nodeboard[new->x][new->y] = iteration;
+                        nodeboard[new->x+1][new->y+1] = iteration;
                         infected[infectedLN] = new;
                         infectedLN++;
                         //check if not startNode
@@ -216,11 +281,14 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                 }
             }
             //down
-            if(Inbound(curS->x, curS->y+1)){
+            if(InboundIm(curS->x, curS->y+1)){
+                //printf("down inbound\n");
                 //node exists
-                if(edgesS[curS->x][curS->y]){
+                if(checkEdge(curS->x,curS->y,1)){
+                    //printf("down edge\n");
                     //not blocked
-                    if(!nodeboard[curS->x][curS->y+1]){
+                    if(!nodeboard[curS->x+1][curS->y+2]){
+                        //printf("down node\n");
                         //gets infected
                         LTNode* new = (LTNode*) malloc(sizeof(LTNode));
                         new->x = curS->x;
@@ -230,7 +298,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                         new->go = 0;
                         endOfChain->next = new;
                         endOfChain = new;
-                        nodeboard[new->x][new->y] = iteration;
+                        nodeboard[new->x+1][new->y+1] = iteration;
                         infected[infectedLN] = new;
                         infectedLN++;
                         //check if not startNode
@@ -466,7 +534,8 @@ int main(void){
     clearNodeBoard();
     clearEdgeInfo();
     
-    Route(0,0,0,4, 4);
+    Route(stationX[1],stationY[1],stationGO[1],stationX[2], stationY[2]);
+    printRoute();
    int ends[] = {3, 4 ,5 ,6 ,7 ,8, 9, 10, 11, 12};
    int endsLN = 10;
    int shortestTo1 = closestStation(1, ends, endsLN);
