@@ -117,14 +117,18 @@ int checkEdge(int x, int y, int s){
     if(s){
         if(x >= 0 && x < 5){
             //not x==-1 or x==5 columns
-            if(y == -1 || y == 4) result = 1;
+            if(y == -1 || y == 4){
+                if(x >0 && x <4) result = 1;
+            }
             else result = edgesS[x][y];
         }
     }
     else{
         if(y >= 0 && y < 5){
             //not y==-1 or y==5 rows
-            if(y == -1 || y == 4) result = 1;
+            if(x == -1 || x == 4){
+                if(y >0 && y <4) result = 1;
+            }
             else result = edgesE[x][y];
         }
     }
@@ -193,8 +197,15 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
     LTNode* startNode;
     int lengthList = 0;
     
+    //printf("starting spread\n");
     ////infection algorithm
     while(!nodeboard[startX+1][startY+1]){
+        //check if spread is occurring
+        if(!spreadersLN){
+            //something gone wrong(inaccessible destination or start)
+            printf("\n////\nRouting Error:\n\tno route available, path is inaccessible\n////\n");
+            break;
+        }
         //spread
         iteration++;
         for(int i = 0; i < spreadersLN; i++){
@@ -202,8 +213,10 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
             //printf("spreading from: c%i%i\n", curS->y,curS->x);
             //left
             if(InboundIm(curS->x-1, curS->y)){
+                //printf("inbound\n");
                 //node exists
                 if(checkEdge(curS->x-1,curS->y,0)){
+                    //printf("edge open\n");
                     //not blocked
                     if(!nodeboard[curS->x][curS->y+1]){
                         //gets infected
@@ -529,6 +542,160 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
     }
     return shortest;
 }
+
+//returns index of closest point from dest to ref
+int closestPos(int refX, int refY, int* destX, int* destY, int destLn){
+    //spread entire board
+    int totalInfected = 1;//if tI=25, or infectedLN=0: stop spreading
+
+    int board[7][7] = {{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}};
+    int buff1x[128];
+    int buff1y[128];
+    int buff2x[128];
+    int buff2y[128];
+
+    int* spreadersX = buff1x;
+    int* spreadersY = buff1y;
+    int spreadersLN = 1;
+    int* infectedX = buff2x;
+    int* infectedY = buff2y;
+    int infectedLN = 0;
+
+    spreadersX[0] = refX;
+    spreadersY[0] = refY;
+    int iteration = 1;//
+    board[refX+1][refY+1] = iteration;
+    while(1){
+        iteration++;
+        //printf("\niteration %i:\n", iteration);
+        for(int i = 0; i < spreadersLN; i++){
+            int curSX = spreadersX[i];
+            int curSY = spreadersY[i];
+            //printf("\n\tspread from (%i,%i)\n\t\t", curSX, curSY);
+            //left
+            if(InboundIm(curSX-1, curSY)){
+                //node exists
+                if(checkEdge(curSX-1,curSY,0)){
+                    //not blocked
+                    if(!board[curSX][curSY+1]){
+                        //gets infected
+                        board[curSX][curSY+1] = iteration;
+                        infectedX[infectedLN] = curSX - 1;
+                        infectedY[infectedLN] = curSY;
+                        //printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        infectedLN++;
+                    }
+                    else{
+                        //printf("immune-left ");
+                    }
+                }
+                else{
+                    //printf("block-left ");
+                }
+            }
+            else{
+                //printf("out-left ");
+            }
+            //right
+            if(InboundIm(curSX+1, curSY)){
+                //node exists
+                if(checkEdge(curSX,curSY,0)){
+                    //not blocked
+                    if(!board[curSX+2][curSY+1]){
+                        //gets infected
+                        board[curSX+2][curSY+1] = iteration;
+                        infectedX[infectedLN] = curSX+1;
+                        infectedY[infectedLN] = curSY;
+                        //printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        infectedLN++;
+                    }
+                    else{
+                        //printf("immune-right ");
+                    }
+                }
+                else{
+                    //printf("block-right ");
+                }
+            }
+            else{
+                //printf("out-right ");
+            }
+            //up
+            if(InboundIm(curSX, curSY-1)){
+                //node exists
+                if(checkEdge(curSX,curSY-1,1)){
+                    //not blocked
+                    if(!board[curSX+1][curSY]){
+                        //gets infected
+                        board[curSX+1][curSY] = iteration;
+                        infectedX[infectedLN] = curSX;
+                        infectedY[infectedLN] = curSY-1;
+                        //printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        infectedLN++;
+                    }
+                    else{
+                        //printf("immune-up ");
+                    }
+                }
+                else{
+                    //printf("block-up ");
+                }
+            }
+            else{
+                //printf("out-up ");
+            }
+            //down
+            if(InboundIm(curSX, curSY+1)){
+                //node exists
+                if(checkEdge(curSX,curSY,1)){
+                    //not blocked
+                    if(!board[curSX+1][curSY+2]){
+                        //gets infected
+                        board[curSX+1][curSY+2] = iteration;
+                        infectedX[infectedLN] = curSX;
+                        infectedY[infectedLN] = curSY+1;
+                        //printf("(%i,%i)",infectedX[infectedLN],infectedY[infectedLN]);
+                        infectedLN++;
+                    }
+                    else{
+                        //printf("immune-down ");
+                    }
+                }
+                else{
+                    //printf("block-down ");
+                }
+            }
+            else{
+                //printf("out-down ");
+            }
+
+        }
+        //switch buffer
+        int* aX;
+        int* aY;
+        aX = spreadersX;
+        aY = spreadersY;
+        spreadersX = infectedX;
+        spreadersY = infectedY;
+        infectedX = aX;
+        infectedY = aY;
+        spreadersLN = infectedLN;
+        infectedLN = 0;
+        if(spreadersLN == 0) break;//stopped spreading
+    }
+    //determine shortest route
+    int shortest = 0;
+    int length = 0xFF;
+    for(int i = 0; i < destLn; i++){
+        //check if shortest
+        if(board[destX[i]+1][destY[i]+1] < length){
+            shortest = i;
+            length = board[destX[i]+1][destY[i]+1];
+        }
+    }
+    return shortest;
+}
+
 ////executing region
 
 /*

@@ -73,9 +73,11 @@ int DriveToFrom(int start, int end){
 
 //Drives from current position to destination position, returns 1 if successful, returns 0 otherwise(leaving curPos on last node, and turning orientation away from mine)
 int DriveToPos(int x, int y){
+    //printf("driving to a pos\n");
     ////routing
     clearNodeBoard();
     Route(curX, curY,curO,x,y);
+    //printf("routed to the pos\n");
     routeLN = retrieveRouteInfo(&routeDir, &routeX, &routeY);
     ////COM Loop
     for(int i = 0; i < routeLN; i++){
@@ -113,6 +115,7 @@ int DriveToPos(int x, int y){
             return 0;
         }
         else{
+            //printf("moved one step close\n");
             ////ok
             //apply new position
             switch(curO){
@@ -164,38 +167,52 @@ void doAorB(int s1, int s2, int s3){
     while(toVisit){
         //make list of stations to visit
         int* toVisitStations = (int*)malloc(toVisit*sizeof(int));
+        int* toVisitX = (int*)malloc(toVisit*sizeof(int));
+        int* toVisitY = (int*)malloc(toVisit*sizeof(int));
         for(int i = 0, j = 0; i < 3; i++){
             if(notVisited[i]){
                 //add element to list
                 toVisitStations[j] = stations[i];
+                toVisitX[j] = getStationX(stations[i]);
+                toVisitY[j] = getStationY(stations[i]);
                 j++;
             }
         }
         //determine closest station to curPos
-        int shortest = closestPos();//function doesn't exist yet
-        printf("///traveling to station %i///\n", shortest);
+        int index = closestPos(curX,curY,toVisitX,toVisitY,toVisit);//function doesn't exist yet
+        printf("///traveling to station %i///\n", toVisitStations[index]);
 
         //drive to shortest, n remove if successfully reached, else continue
-        if(DriveToPos(getStationX(shortest), getStationY(shortest))){
+        if(DriveToPos(toVisitX[index], toVisitY[index])){
             ////successfully reached
+            printf("///station %i reached///\n", toVisitStations[index]);
             for(int i = 0; i < 3; i++){
-                printf("///station %i reached///\n", shortest);
-                if(stations[i]==shortest){
+                if(stations[i]==toVisitStations[index]){
                     //removing station from to-visit list
                     notVisited[i] = 0;
                     toVisit--;
                 }
             }
         }
+        else{
+            printf("///mine found in direction %i of (%i,%i)///\n", (curO+2)%4, curX, curY);
+        }
+        //release resources
+        free(toVisitStations);
+        free(toVisitX);
+        free(toVisitY);
     }
     send(4);//victory dance
+    printf("ahmen!!!\n");
 }
 
 int main(void){
     //InitialiseCom();
     clearEdgeInfo();
-    int result = DriveToPos(getStationX(2),getStationY(2));
-    printf("result = %i\n", result);
+    //int result = DriveToPos(getStationX(2),getStationY(2));
+    //printf("result = %i\n", result);
     //CloseCom();
+
+    doAorB(2,3,4);
     return 0;
 }

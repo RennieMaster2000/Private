@@ -69,6 +69,9 @@ void Route(int startX, int startY, int startDir, int endX, int endY);
 //closest station to a start station
 int closestStation(int startStation, int* endStations, int lnEndStations);
 
+//returns index of closest point from dest to ref
+int closestPos(int refX, int refY, int* destX, int* destY, int destLn);
+
 ////Display region
 
 //print the nodes on route and the directions inbetween
