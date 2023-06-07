@@ -212,7 +212,26 @@ int main(void){
     //int result = DriveToPos(getStationX(2),getStationY(2));
     //printf("result = %i\n", result);
     //CloseCom();
-
-    doAorB(2,3,4);
+    printf("Welcome to our EPO2: MinEvader3000!\n");
+    printf("Would you like to do challenge A, B or C? ");
+    char challenge;
+    scanf("%c", &challenge);
+    switch(challenge){
+        case 'A':
+        case 'B':
+            //A&B
+            printf("To which stations would you like to travel? [# # #] ");
+            int s1, s2, s3;
+            scanf("%i %i %i", &s1, &s2, &s3);
+            printf("We're starting up challenge A/B right now!\n\n\n");
+            doAorB(s1,s2,s3);
+            break;
+        case 'C':
+            //C
+            break;
+        default:
+            printf("We don't know that challenge here, so get lost!!!\n");
+            break;
+    }
     return 0;
 }
