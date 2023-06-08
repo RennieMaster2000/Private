@@ -62,7 +62,7 @@ int readByte(char *buffRead) {
 
     if (!ReadFile(hSerial, buffRead, 1, &dwBytesRead, NULL))
     {
-        printf("error reading byte from input buffer \n");
+        //printf("error reading byte from input buffer \n");
     }
     //printf("Byte read from read buffer is: %c \n", buffRead[0]);
     return(0);

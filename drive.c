@@ -211,7 +211,6 @@ int main(void){
     clearEdgeInfo();
     //int result = DriveToPos(getStationX(2),getStationY(2));
     //printf("result = %i\n", result);
-    //CloseCom();
     printf("Welcome to our EPO2: MinEvader3000!\n");
     printf("Would you like to do challenge A, B or C? ");
     char challenge;
@@ -228,10 +227,12 @@ int main(void){
             break;
         case 'C':
             //C
+            printf("Nah bro, we don't do that here\n");
             break;
         default:
             printf("We don't know that challenge here, so get lost!!!\n");
             break;
     }
+    //CloseCom();
     return 0;
 }

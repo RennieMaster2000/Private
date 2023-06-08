@@ -196,6 +196,10 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
     int iteration = 1;
     LTNode* startNode;
     int lengthList = 0;
+
+    //collecting final nodes
+    LTNode* topOfTree[16];
+    int lnTOT = 0;
     
     //printf("starting spread\n");
     ////infection algorithm
@@ -218,7 +222,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                 if(checkEdge(curS->x-1,curS->y,0)){
                     //printf("edge open\n");
                     //not blocked
-                    if(!nodeboard[curS->x][curS->y+1]){
+                    if((!nodeboard[curS->x][curS->y+1])|| nodeboard[curS->x][curS->y+1]==iteration){
                         //gets infected
                         LTNode* new = (LTNode*) malloc(sizeof(LTNode));
                         new->x = curS->x-1;
@@ -234,6 +238,8 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                         //check if not startNode
                         if(new->x == startX && new->y == startY){
                             startNode = new;
+                            topOfTree[lnTOT] = new;
+                            lnTOT++;
                             //printf("found\n");
                         }
                         //printf("new: %i at c%i%i left\n", iteration, new->y, new->x);
@@ -245,7 +251,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                 //node exists
                 if(checkEdge(curS->x,curS->y,0)){
                     //not blocked
-                    if(!nodeboard[curS->x+2][curS->y+1]){
+                    if((!nodeboard[curS->x+2][curS->y+1])||nodeboard[curS->x+2][curS->y+1]==iteration){
                         //gets infected
                         LTNode* new = (LTNode*) malloc(sizeof(LTNode));
                         new->x = curS->x+1;
@@ -261,6 +267,8 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                         //check if not startNode
                         if(new->x == startX && new->y == startY){
                             startNode = new;
+                            topOfTree[lnTOT] = new;
+                            lnTOT++;
                             //printf("found\n");
                         }
                         //printf("new: %i at c%i%i right\n", iteration, new->y, new->x);
@@ -272,7 +280,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                 //node exists
                 if(checkEdge(curS->x,curS->y-1,1)){
                     //not blocked
-                    if(!nodeboard[curS->x+1][curS->y]){
+                    if((!nodeboard[curS->x+1][curS->y])||nodeboard[curS->x+1][curS->y]==iteration){
                         //gets infected
                         LTNode* new = (LTNode*) malloc(sizeof(LTNode));
                         new->x = curS->x;
@@ -288,6 +296,8 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                         //check if not startNode
                         if(new->x == startX && new->y == startY){
                             startNode = new;
+                            topOfTree[lnTOT] = new;
+                            lnTOT++;
                             //printf("found\n");
                         }
                         //printf("new: %i at c%i%i up\n", iteration, new->y, new->x);
@@ -301,7 +311,7 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                 if(checkEdge(curS->x,curS->y,1)){
                     //printf("down edge\n");
                     //not blocked
-                    if(!nodeboard[curS->x+1][curS->y+2]){
+                    if((!nodeboard[curS->x+1][curS->y+2])||nodeboard[curS->x+1][curS->y+2]==iteration){
                         //printf("down node\n");
                         //gets infected
                         LTNode* new = (LTNode*) malloc(sizeof(LTNode));
@@ -318,6 +328,8 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
                         //check if not startNode
                         if(new->x == startX && new->y == startY){
                             startNode = new;
+                            topOfTree[lnTOT] = new;
+                            lnTOT++;
                             //printf("found\n");
                         }
                         //printf("new: %i at c%i%i down\n", iteration, new->y, new->x);
@@ -341,6 +353,27 @@ void Route(int startX, int startY, int startDir, int endX, int endY){
     }
     //preping for determining route
     routeLength = iteration;
+    printf("amount of possible paths of length %i: %i\n", routeLength, lnTOT);
+    //determining path of least turns
+    int index = 0;
+    int sumOfTurns = 99;
+    LTNode startplaceholder;
+    startplaceholder.go = startDir;
+    for(int i = 0; i < lnTOT; i++){
+        int localSOT = 0;
+        LTNode* prevTNode = &startplaceholder;
+        LTNode* curTNode = topOfTree[i];
+        for(int j = 0; j < routeLength - 1; j++){
+            localSOT += (curTNode->go - prevTNode->go+4)%2;
+            prevTNode = curTNode;
+            curTNode = curTNode->parent;
+        }
+        if(localSOT < sumOfTurns){
+            sumOfTurns = localSOT;
+            index = i;
+        } 
+    }
+    startNode = topOfTree[index];
     //
     if(routeX) free(routeX);
     if(routeY) free(routeY);
