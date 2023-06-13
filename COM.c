@@ -4,11 +4,14 @@
 #include <string.h>
 #include <time.h>
 
-#define COMPORT "COM2"
 #define BAUDRATE CBR_9600
 #define DLAY 10
 #define TIMEOUT 10
 
+char COMPORT[5] = "COM8";
+void setCOM(int com){
+    COMPORT[3] = com+48;
+}
 HANDLE hSerial;
 //--------------------------------------------------------------
 // Function: initSio

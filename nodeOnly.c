@@ -576,6 +576,7 @@ int closestStation(int startStation, int* endStations, int lnEndStations){
     return shortest;
 }
 
+int pureSpreading(int refX, int refY)
 //returns index of closest point from dest to ref
 int closestPos(int refX, int refY, int* destX, int* destY, int destLn){
     //spread entire board

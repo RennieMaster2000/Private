@@ -1,3 +1,4 @@
+void setCOM(int com);
 int InitialiseCom(void);
 
 void CloseCom(void);

@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include "nodeOnly.h"
 #include "COM.h"
-int curO = 0;//getStationGO(1);
-int curX = 1;//getStationX(1);
-int curY = 5;//getStationY(1);
+int curO = 0;
+int curX = 1;
+int curY = 4;
 int* routeX;
 int* routeY;
 int* routeDir;
@@ -87,7 +87,7 @@ int DriveToPos(int x, int y){
         ////recieve
         //recieve
         int response = recieve();
-        if(response){
+        if(!response){
             //printf("mine\n");
             ////mine
             //apply new orientation, pos stays the same
@@ -135,12 +135,12 @@ int DriveToPos(int x, int y){
 //function for position to station(B)
 //possibly seperate station from onboard movement
 
-void sendR(int d){
+void send(int d){
     printf("send: %i\n",d);
     sendCOM(d);
 }
 
-int recieveR(void){
+int recieve(void){
     int d;
     printf("recieve: ");
     d = recieveCOM();
@@ -149,11 +149,11 @@ int recieveR(void){
     return d;
 }
 
-void send(int d){
+void sendD(int d){
     printf("send: %i\n",d);
 }
 
-int recieve(void){
+int recieveD(void){
     int d;
     printf("recieve: ");
     scanf("%i", &d);
@@ -161,6 +161,10 @@ int recieve(void){
 }
 
 void doAorB(int s1, int s2, int s3){
+    //start signal
+    send(0x06);
+    recieve();
+    //
     int stations[3] = {s1,s2,s3};
     int notVisited[3] = {1,1,1};
     int toVisit = 3;
@@ -206,14 +210,68 @@ void doAorB(int s1, int s2, int s3){
     printf("ahmen!!!\n");
 }
 
+int startingGO[13] = {0, 0, 0, 0, 3, 3, 3, 2, 2, 2, 1, 1, 1};
+int startingX[13] = {0, 1, 2, 3, 4, 4, 4, 3, 2, 1, 0, 0, 0};
+int startingY[13] = {0, 4, 4, 4, 3, 2, 1, 0, 0, 0, 1, 2, 3};
+void startingFrom(int station){
+    curO = startingGO[station];
+    curX = startingX[station];
+    curY = startingY[station];
+}
+
+int dist(int x, int y){
+    int xRes = x - curX;
+    if(xRes<0) xRes = -xRes;
+    int yRes = y - curY;
+    if(yRes<0) yRes = -yRes;
+    return xRes + yRes;
+}
+
+void doC(void){
+    ////global
+    //filling list of coords
+    int X[25];
+    int Y[25];
+    int j = 0;
+    for(int x = 0; x<5; x++){
+        for(int y=0; y<5; y++){
+            X[j] = x;
+            Y[j] = y;
+            j++;
+        }
+    }
+    int nodesToVisit;
+    ////searching for mines
+    int board[7][7];
+    nodesToVisit = 25;
+    int D1[25];
+    int minesFound = 0;
+    while(nodesToVisit){
+        //spread
+        //determining furthest
+        //drive(if successful: remove node; else: note the mine)
+    }
+    ////searching for treasure
+    int D2[25];
+    int treasuresFound = 0;
+}
 int main(void){
-    //InitialiseCom();
     clearEdgeInfo();
     //int result = DriveToPos(getStationX(2),getStationY(2));
     //printf("result = %i\n", result);
     printf("Welcome to our EPO2: MinEvader3000!\n");
+    printf("What COM port is used? COM");
+    int comport;
+    scanf("%i",&comport);
+    setCOM(comport);
+    InitialiseCom();
+    printf("Where are you located? station: ");
+    int startingstation;
+    scanf("%i", &startingstation);
+    startingFrom(startingstation);
     printf("Would you like to do challenge A, B or C? ");
     char challenge;
+    scanf("%c");
     scanf("%c", &challenge);
     switch(challenge){
         case 'A':
@@ -233,6 +291,6 @@ int main(void){
             printf("We don't know that challenge here, so get lost!!!\n");
             break;
     }
-    //CloseCom();
+    CloseCom();
     return 0;
 }
