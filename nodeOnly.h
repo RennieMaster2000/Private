@@ -32,6 +32,9 @@ void clearEdgeInfo(void);
 
 //blocks edge
 void blockEdge(int x, int y, int s);
+
+//returns 1 if Edge is accesible
+int checkEdge(int x, int y, int s);
 //////end Mapping
 
 //////Routing
@@ -68,6 +71,9 @@ void Route(int startX, int startY, int startDir, int endX, int endY);
 
 //closest station to a start station
 int closestStation(int startStation, int* endStations, int lnEndStations);
+
+//spreads and gives distances from ref in board
+void pureSpreading(int refX, int refY, int* board);
 
 //returns index of closest point from dest to ref
 int closestPos(int refX, int refY, int* destX, int* destY, int destLn);
